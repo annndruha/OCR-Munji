@@ -9,7 +9,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# from textrecognizer import get_sub_points, replacer
+
 def get_sub_points(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_padding=0):
     x_top = np.linspace(a[0][0], a[1][0], l + 1)
     x_bottom = np.linspace(a[3][0], a[2][0], l + 1)
@@ -24,7 +24,27 @@ def get_sub_points(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_
         polys.append(np.array(pts, dtype=np.int32))
     return polys
 
-# print(''.join(sorted(list(set(response.text_annotations[0].description)))))
+
+def save_letter(letter, crop_img):
+    code = '_'.join([str(ord(i)) for i in letter])
+    folder_name = str(code) + f'_{letter}'
+    if not os.path.exists(os.path.join('letters', folder_name)):
+        os.makedirs(os.path.join('letters', folder_name))
+    cv2.imwrite(os.path.join('letters', folder_name, f'{time.time()}.jpg'), crop_img)
+
+
+def ord353(img, poly):
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+    crop_img = img[y2 - 2:y2 + 18, x0:x2]
+    crop_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+
+    template = cv2.imread('templates/dot.jpg')
+    if np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED)) > 0.45:
+        letter = 'ṣ̌'
+    else:
+        letter = 'š'
+    save_letter(letter, crop_img)
+    return letter
 
 
 def create_dataset(img_path, response):
@@ -34,17 +54,21 @@ def create_dataset(img_path, response):
     for text in texts[1:]:
         pts = np.array([(vertex.x, vertex.y) for vertex in text.bounding_poly.vertices])
         polys = get_sub_points(pts, len(text.description), right_padding=0)
-        # word_letters = []
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
-            crop_img = img[poly[0][1]:poly[2][1], poly[0][0]:poly[2][0]]
-            try:
-                if not os.path.exists(os.path.join('letters', str(ord(letter)) + f'_{letter}')):
-                    os.makedirs(os.path.join('letters', str(ord(letter)) + f'_{letter}'))
-                cv2.imwrite(os.path.join('letters', str(ord(letter)) + f'_{letter}', f'{time.time()}.jpg'), crop_img)
-            except OSError:
-                if not os.path.exists(os.path.join('letters', str(ord(letter)))):
-                    os.makedirs(os.path.join('letters', str(ord(letter))))
-                cv2.imwrite(os.path.join('letters', str(ord(letter)), f'{time.time()}.jpg'), crop_img)
+            (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+# ====================================================================================================
+            if ord(letter) == 353:
+                letter = ord353(img, poly)
+# ====================================================================================================
+            # crop_img = img[y0-15:y2+15, x0:x2]
+            # try:
+            #     if not os.path.exists(os.path.join('letters', str(ord(letter)) + f'_{letter}')):
+            #         os.makedirs(os.path.join('letters', str(ord(letter)) + f'_{letter}'))
+            #     cv2.imwrite(os.path.join('letters', str(ord(letter)) + f'_{letter}', f'{time.time()}.jpg'), crop_img)
+            # except OSError:
+            #     if not os.path.exists(os.path.join('letters', str(ord(letter)))):
+            #         os.makedirs(os.path.join('letters', str(ord(letter))))
+            #     cv2.imwrite(os.path.join('letters', str(ord(letter)), f'{time.time()}.jpg'), crop_img)
 
 
 if __name__ == '__main__':
@@ -61,3 +85,15 @@ if __name__ == '__main__':
         from google.cloud import vision  # This 'unused' import used for pickle.load
         response = pickle.load(f)
     create_dataset(IMG_PATH, response)
+
+    # import cv2
+    # import numpy as np
+    # img = cv2.imread(IMG_PATH)
+    # texts = response.text_annotations
+    # for text in texts[1:]:
+    #     pts = np.array([(vertex.x, vertex.y) for vertex in text.bounding_poly.vertices])
+    #     polys = get_sub_points(pts, len(text.description))
+    #     for poly in polys:
+    #         img = cv2.polylines(img, [poly], True, (0, 0, 255), 1)
+    # plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # plt.show()
