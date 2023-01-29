@@ -17,14 +17,31 @@ from utils import save_letter
 def create_dataset(img_path, response):
     img = cv2.imread(img_path)
     texts = response.text_annotations
+    result_text = []
     for text in texts[1:]:
         pts = np.array([(vertex.x, vertex.y) for vertex in text.bounding_poly.vertices])
         polys = get_sub_polys(pts, len(text.description), right_padding=0)
+        word_letters = []
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
             # TEST BLOCK ====================
-            if letter in ['u', 'ú', 'ū', 'ü', 'a', 'á', 'ã', 'ā']:
-                letter = mapping(img, poly, letter)
-                # print(letter, end='')
+            # if letter in ['u', 'ú', 'ū', 'ü', 'a', 'á', 'ã', 'ā']:
+            #     letter = mapping(img, poly, letter)
+            letter = mapping(img, poly, letter)
+            word_letters.append(letter)
+        result_text.append(''.join(word_letters))
+    text = ''
+    for i, word in enumerate(result_text):
+        if word in ['.', ',', '[', ']', ":", '-', '"', '?', '!']:
+            if result_text[i - 1] in [':']:
+                text += ' ' + word
+            else:
+                text += word
+        else:
+            if result_text[i - 1] in ['-', '"']:
+                text += word
+            else:
+                text += ' ' + word
+    return text
 
 
 # END TEST BLOCK ====================
@@ -35,23 +52,23 @@ def create_dataset(img_path, response):
 
 
 if __name__ == '__main__':
-    IMG_PATH = "tests/text1/img.png"
-    RESP_PATH = "tests/text1/google_response.pickle"
-    with open(RESP_PATH, "rb") as f:
-        from google.cloud import vision  # This 'unused' import used for pickle.load
-
-        response = pickle.load(f)
-    create_dataset(IMG_PATH, response)
+    # IMG_PATH = "tests/text1/img.png"
+    # RESP_PATH = "tests/text1/google_response.pickle"
+    # with open(RESP_PATH, "rb") as f:
+    #     from google.cloud import vision  # This 'unused' import used for pickle.load
+    #
+    #     response = pickle.load(f)
+    # create_dataset(IMG_PATH, response)
 
     IMG_PATH = "tests/text2/img.png"
     RESP_PATH = "tests/text2/google_response.pickle"
     with open(RESP_PATH, "rb") as f:
         from google.cloud import vision  # This 'unused' import used for pickle.load
-
         response = pickle.load(f)
 
-    shutil.rmtree('letters')
-    create_dataset(IMG_PATH, response)
+    # shutil.rmtree('letters')
+    with open('tests/text2/result.txt', 'w') as f:
+        f.write(create_dataset(IMG_PATH, response))
 
     # import cv2
     # import numpy as np

@@ -39,6 +39,7 @@ def mapping(img, poly, letter: str) -> str:
             'š': __under_dot,
             'ž': __under_dot,
             'č': __under_dot,
+
             'u': __upper_comb_u,
             'ú': __upper_comb_u,
             'ū': __upper_comb_u,
@@ -80,19 +81,25 @@ def __upper_comb_u(img, poly, letter):
 
     prob = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line.jpg'), cv2.TM_CCOEFF_NORMED))
+
+    if letter in ['u', 'ú', 'ū', 'ü']:
+        letter = 'u'
+    elif letter in ['a', 'á', 'ã', 'ā']:
+        letter = 'a'
+
     if prob > 0.51:
         if (prob+1-prob2)/2 > 0.5:
-            letter = 'line_acute'
+            # letter += u'\u0304' + u'\u0301'
+            letter = 'ā́' if letter == 'a' else 'ū́'
         else:
-            letter = 'line'
+            # letter += u'\u0304'
+            letter = 'ā' if letter == 'a' else 'ū'
     else:
         if np.average(crop_img) / 255. > 0.95:
-            letter = 'empty'
+            letter = letter
         else:
-            letter = 'acute'
+            # letter += u'\u0301'
+            letter = 'á' if letter == 'a' else 'ú'
 
-    save_letter(letter, crop_img)
-    # letter = 'down'
-    # crop_img = img[y2-25:y2, x0:x2]
     # save_letter(letter, crop_img)
     return letter
