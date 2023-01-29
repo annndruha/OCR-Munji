@@ -43,6 +43,11 @@ def mapping(img, poly, letter: str) -> str:
             'ú': __upper_comb_u,
             'ū': __upper_comb_u,
             'ü': __upper_comb_u,
+
+            'a': __upper_comb_u,
+            'á': __upper_comb_u,
+            'ã': __upper_comb_u,
+            'ā': __upper_comb_u
         }
         res = d[letter]
         if callable(res):
@@ -68,12 +73,26 @@ def __under_dot(img, poly, letter):
 
 def __upper_comb_u(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-    crop_img = img[y0:y2, x0:x2]
-    crop_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    if y2-y0 < 15 or x2-x0 < 10:
+        return ''
+    crop_img = img[y0-15:y2-25, x0:x2]
+    bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
-    # template = cv2.imread('templates/dot.jpg')
-    # prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
-    # if prob > 0.45:
-    #     letter = letter + u'\u0323'
+    prob = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    if prob > 0.51:
+        prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+        if prob2 > 0.8:
+            letter = 'line_acute'
+        else:
+            letter = 'line'
+    else:
+        if np.average(crop_img) / 255. > 0.95:
+            letter = 'empty'
+        else:
+            letter = 'acute'
+
     save_letter(letter, crop_img)
+    # letter = 'down'
+    # crop_img = img[y2-25:y2, x0:x2]
+    # save_letter(letter, crop_img)
     return letter

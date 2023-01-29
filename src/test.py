@@ -4,6 +4,7 @@
 import os
 import time
 import pickle
+import shutil
 
 import cv2
 import numpy as np
@@ -21,9 +22,9 @@ def create_dataset(img_path, response):
         polys = get_sub_polys(pts, len(text.description), right_padding=0)
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
             # TEST BLOCK ====================
-            if letter in ['u', 'ú', 'ū', 'ü']:
+            if letter in ['u', 'ú', 'ū', 'ü', 'a', 'á', 'ã', 'ā']:
                 letter = mapping(img, poly, letter)
-                print(letter, end='')
+                # print(letter, end='')
 
 
 # END TEST BLOCK ====================
@@ -48,6 +49,8 @@ if __name__ == '__main__':
         from google.cloud import vision  # This 'unused' import used for pickle.load
 
         response = pickle.load(f)
+
+    shutil.rmtree('letters')
     create_dataset(IMG_PATH, response)
 
     # import cv2
