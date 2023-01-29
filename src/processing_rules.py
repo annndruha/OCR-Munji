@@ -79,9 +79,9 @@ def __upper_comb_u(img, poly, letter):
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     prob = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line.jpg'), cv2.TM_CCOEFF_NORMED))
     if prob > 0.51:
-        prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
-        if prob2 > 0.8:
+        if (prob+1-prob2)/2 > 0.5:
             letter = 'line_acute'
         else:
             letter = 'line'
