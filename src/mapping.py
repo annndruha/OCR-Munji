@@ -239,7 +239,8 @@ def __upper_comb_u(img, poly, letter, j):
                                                  value=(230, 255, 255))
                 prob4 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə_acute.jpg'),
                                                  cv2.TM_CCOEFF_NORMED))
-                if prob4 > 0.9:
+                print(prob4)
+                if prob4 > 0.8:
                     letter = 'ə́'
                 else:
                     letter = 'á'
