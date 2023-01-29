@@ -230,7 +230,14 @@ def __upper_comb_u(img, poly, letter, j):
     else:
         prob3 = np.average(crop_img) / 255.
         if prob3 > 0.95:  # Empty space
-            letter = letter
+            if letter == 'a':
+                crop_img = img[y0:y2, x0:x2]
+                bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None,
+                                                 value=(230, 255, 255))
+                prob5 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə.jpg'),
+                                                 cv2.TM_CCOEFF_NORMED))
+                if prob5 > 0.76:
+                    letter = 'ə'
         else:
             letter = 'á' if letter == 'a' else 'ú'  # letter += u'\u0301'
             if letter == 'á':
@@ -239,7 +246,6 @@ def __upper_comb_u(img, poly, letter, j):
                                                  value=(230, 255, 255))
                 prob4 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə_acute.jpg'),
                                                  cv2.TM_CCOEFF_NORMED))
-                print(prob4)
                 if prob4 > 0.8:
                     letter = 'ə́'
                 else:
