@@ -51,6 +51,7 @@ def mapping(img, poly, letter: str) -> str:
             'ā': __upper_comb_u,
 
             'o': __upper_comb_o,
+            'k': __upper_comb_k
         }
         res = d[letter]
         if callable(res):
@@ -87,6 +88,23 @@ def __upper_comb_o(img, poly, letter):
         letter = 'ó'
     else:
         letter = 'o'
+    save_letter(letter, crop_img)
+    return letter
+
+
+def __upper_comb_k(img, poly, letter):
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+    if y2-y0 < 10 or x2-x0 < 10:
+        return ''
+    crop_img = img[y0:y2, x0:x2]
+    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+
+    prob = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k.jpg'), cv2.TM_CCOEFF_NORMED))
+    if (prob + 1 - prob2) / 2 > 0.5:
+        letter = 'ḱ'
+    else:
+        letter = 'k'
     save_letter(letter, crop_img)
     return letter
 
