@@ -5,6 +5,7 @@ import os
 import time
 import pickle
 import shutil
+from google.cloud import vision  # This 'unused' import used for pickle.load
 
 import cv2
 import numpy as np
@@ -58,19 +59,18 @@ if __name__ == '__main__':
     IMG_PATH = "tests/text1/img.png"
     RESP_PATH = "tests/text1/google_response.pickle"
     with open(RESP_PATH, "rb") as f:
-        from google.cloud import vision  # This 'unused' import used for pickle.load
         response = pickle.load(f)
-    create_dataset(IMG_PATH, response, 100000)
+    text = create_dataset(IMG_PATH, response, 100000)
+    with open(IMG_PATH.replace('img.png', 'result.txt'), 'w') as f:
+        f.write(text)
 
     IMG_PATH = "tests/text2/img.png"
     RESP_PATH = "tests/text2/google_response.pickle"
     with open(RESP_PATH, "rb") as f:
-        from google.cloud import vision  # This 'unused' import used for pickle.load
         response = pickle.load(f)
-    create_dataset(IMG_PATH, response, 200000)
-
-    # with open('tests/text2/result.txt', 'w') as f:
-    #     f.write(create_dataset(IMG_PATH, response))
+    text = create_dataset(IMG_PATH, response, 200000)
+    with open(IMG_PATH.replace('img.png', 'result.txt'), 'w') as f:
+        f.write(text)
 
     # import cv2
     # import numpy as np

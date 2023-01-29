@@ -32,8 +32,8 @@ def mapping(img, poly, letter: str, j) -> str:
             'S': 'š' + u'\u0323',
             'j': 'ǰ',
             'J': 'ǰ',
-            'e': __upper_comb_e,
-            'é': 'ə́',  # Wrong, but statistic
+            'e': __check_reversed_e,
+            'é': __check_reversed_e_acute,
             'ś': 'ə' + u'\u0301',
 
             'ṣ': __under_dot,
@@ -88,7 +88,7 @@ def __under_dot(img, poly, letter, j):
     return letter
 
 
-def __upper_comb_e(img, poly, letter, j):
+def __check_reversed_e(img, poly, letter, j):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -99,8 +99,27 @@ def __upper_comb_e(img, poly, letter, j):
     if prob1 > prob2:
         letter = 'e'
     else:
-        letter = 'ə'
-    save_letter(letter, crop_img, 'comb_e_{}'.format(j))
+        prob3 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+        if prob3 > prob2:
+            letter = 'ə́'
+        else:
+            letter = 'ə'
+    save_letter(letter, crop_img, 'revers_e_{}'.format(j))
+    return letter
+
+
+def __check_reversed_e_acute(img, poly, letter, j):
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+    crop_img = img[y0:y2, x0:x2]
+    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+
+    prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/e_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    if prob1 > prob2:
+        letter = 'é'
+    else:
+        letter = 'ə́'
+    save_letter(letter, crop_img, 'revers_e_acute_{}'.format(j))
     return letter
 
 
@@ -169,12 +188,12 @@ def __acute_i(img, poly, letter, j):
 #     crop_img = img[y0:y2, x0:x2]
 #     bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 #
-#     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k_acute.jpg'), cv2.TM_CCOEFF_NORMED))
-#     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k.jpg'), cv2.TM_CCOEFF_NORMED))
+#     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/b_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+#     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/b.jpg'), cv2.TM_CCOEFF_NORMED))
 #     if prob1 > prob2:
-#         letter = 'ḱ'
+#         letter = 'b'
 #     else:
-#         letter = 'k'
+#         letter = 'b'
 #     save_letter(letter, crop_img, 'comb_k_{}'.format(j))
 #     return letter
 
