@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-from processing_rules import mapping, get_sub_polys
+from mapping import mapping, get_sub_polys
 from utils import save_letter
 
 
