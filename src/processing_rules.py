@@ -55,7 +55,7 @@ def mapping(img, poly, letter: str, j) -> str:
             'k': __acute_k,
             # 'b': __acute_b,
             'g': __acute_g,
-            # 'i': __acute_i,
+            'i': __acute_i,
         }
         res = d[letter]
         if callable(res):
@@ -149,19 +149,19 @@ def __acute_g(img, poly, letter, j):
     return letter
 
 
-# def __acute_b(img, poly, letter, j):
-#     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-#     crop_img = img[y0:y2, x0:x2]
-#     bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
-#
-#     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k_acute.jpg'), cv2.TM_CCOEFF_NORMED))
-#     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k.jpg'), cv2.TM_CCOEFF_NORMED))
-#     if prob1 > prob2:
-#         letter = 'ḱ'
-#     else:
-#         letter = 'k'
-#     save_letter(letter, crop_img, 'comb_k_{}'.format(j))
-#     return letter
+def __acute_i(img, poly, letter, j):
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+    crop_img = img[y0:y2, x0:x2]
+    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+
+    prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/i_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/i.jpg'), cv2.TM_CCOEFF_NORMED))
+    if prob1 > prob2:
+        letter = 'í'
+    else:
+        letter = 'i'
+    save_letter(letter, crop_img, 'comb_i_{}'.format(j))
+    return letter
 
 
 # def __acute_b(img, poly, letter, j):
