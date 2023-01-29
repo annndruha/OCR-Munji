@@ -24,7 +24,7 @@ def create_dataset(img_path, response):
         word_letters = []
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
             # TEST BLOCK ====================
-            # if letter in ['u', 'ú', 'ū', 'ü', 'a', 'á', 'ã', 'ā']:
+            # if letter in ['o']:
             #     letter = mapping(img, poly, letter)
             letter = mapping(img, poly, letter)
             word_letters.append(letter)
@@ -52,6 +52,8 @@ def create_dataset(img_path, response):
 
 
 if __name__ == '__main__':
+    shutil.rmtree('letters', ignore_errors=True)
+
     # IMG_PATH = "tests/text1/img.png"
     # RESP_PATH = "tests/text1/google_response.pickle"
     # with open(RESP_PATH, "rb") as f:
@@ -66,7 +68,9 @@ if __name__ == '__main__':
         from google.cloud import vision  # This 'unused' import used for pickle.load
         response = pickle.load(f)
 
-    # shutil.rmtree('letters')
+
+    # create_dataset(IMG_PATH, response)
+
     with open('tests/text2/result.txt', 'w') as f:
         f.write(create_dataset(IMG_PATH, response))
 
