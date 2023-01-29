@@ -58,7 +58,6 @@ if __name__ == '__main__':
     # RESP_PATH = "tests/text1/google_response.pickle"
     # with open(RESP_PATH, "rb") as f:
     #     from google.cloud import vision  # This 'unused' import used for pickle.load
-    #
     #     response = pickle.load(f)
     # create_dataset(IMG_PATH, response)
 
@@ -67,9 +66,7 @@ if __name__ == '__main__':
     with open(RESP_PATH, "rb") as f:
         from google.cloud import vision  # This 'unused' import used for pickle.load
         response = pickle.load(f)
-
-
-    # create_dataset(IMG_PATH, response)
+    create_dataset(IMG_PATH, response)
 
     with open('tests/text2/result.txt', 'w') as f:
         f.write(create_dataset(IMG_PATH, response))
