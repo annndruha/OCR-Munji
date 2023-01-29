@@ -4,7 +4,7 @@
 import cv2
 import numpy as np
 
-# from utils import save_letter
+from utils import save_letter
 
 
 def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_padding=0):
@@ -87,7 +87,7 @@ def __under_dot(img, poly, letter, j):
 def __check_reversed_e(img, poly, letter, j):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
-    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/e.jpg'), cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə.jpg'), cv2.TM_CCOEFF_NORMED))
@@ -137,7 +137,7 @@ def __check_reversed_e_acute_o(img, poly, letter, j):
 def __acute_o(img, poly, letter, j):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
-    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/o_acute.jpg'), cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/o.jpg'), cv2.TM_CCOEFF_NORMED))
@@ -152,7 +152,7 @@ def __acute_o(img, poly, letter, j):
 def __acute_k(img, poly, letter, j):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
-    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k_acute.jpg'), cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/k.jpg'), cv2.TM_CCOEFF_NORMED))

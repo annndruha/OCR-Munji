@@ -35,8 +35,8 @@ if __name__ == '__main__':
     # For example:
     # GOOGLE_APPLICATION_CREDENTIALS=C:\Users\%username%\google_credentials.json
 
-    resp = get_response("tests/text2/img.png")
-    with open("tests/text2/google_response.pickle", "wb") as f:
+    resp = get_response("tests/pages_20-21/img.png")
+    with open("tests/pages_20-21/google_response.pickle", "wb") as f:
         pickle.dump(resp, f)
 
     # with open("tests/text1/google_response.pickle", "rb") as f:

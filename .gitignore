@@ -2,6 +2,7 @@
 all_letters/
 letters*/
 data/
+pages_20-21/*
 
 
 # Byte-compiled / optimized / DLL files
@@ -133,3 +134,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+tests/pages_20-21/result.txt
+tests/pages_20-21/img.png
+tests/pages_20-21/google_response.pickle
