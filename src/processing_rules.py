@@ -8,6 +8,7 @@ import pickle
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+from utils import save_letter
 
 
 def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_padding=0):
@@ -35,13 +36,13 @@ def mapping(img, poly, letter: str) -> str:
             'é': 'ə́',  # Wrong, but statistic
             'ś': 'ə' + u'\u0301',
 
-            'š': under_dot,
-            'ž': under_dot,
-            'č': under_dot,
-            'u': upper_comb_u,
-            'ú': upper_comb_u,
-            'ū': upper_comb_u,
-            'ü': upper_comb_u,
+            'š': __under_dot,
+            'ž': __under_dot,
+            'č': __under_dot,
+            'u': __upper_comb_u,
+            'ú': __upper_comb_u,
+            'ū': __upper_comb_u,
+            'ü': __upper_comb_u,
         }
         res = d[letter]
         if callable(res):
@@ -52,7 +53,7 @@ def mapping(img, poly, letter: str) -> str:
         return letter  # Work well or unknown
 
 
-def under_dot(img, poly, letter):
+def __under_dot(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y2 - 2:y2 + 18, x0:x2]
     crop_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -65,14 +66,14 @@ def under_dot(img, poly, letter):
     return letter
 
 
-def upper_comb_u(img, poly, letter):
+def __upper_comb_u(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-    crop_img = img[y2 - 2:y2 + 18, x0:x2]
+    crop_img = img[y0:y2, x0:x2]
     crop_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
-    template = cv2.imread('templates/dot.jpg')
-    prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
-    if prob > 0.45:
-        letter = letter + u'\u0323'
-    # save_letter(letter, crop_img)
+    # template = cv2.imread('templates/dot.jpg')
+    # prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
+    # if prob > 0.45:
+    #     letter = letter + u'\u0323'
+    save_letter(letter, crop_img)
     return letter

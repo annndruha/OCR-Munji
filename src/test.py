@@ -10,19 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from processing_rules import mapping, get_sub_polys
-
-
-def save_letter(letter, crop_img, folder='letters'):
-    folder_code = str('_'.join([str(ord(i)) for i in letter]))
-    folder_name = folder_code + f'_{letter}'
-    try:
-        if not os.path.exists(os.path.join(folder, folder_name)):
-            os.makedirs(os.path.join(folder, folder_name))
-        cv2.imwrite(os.path.join(folder, folder_name, f'{time.time()}.jpg'), crop_img)
-    except OSError:
-        if not os.path.exists(os.path.join(folder, folder_code)):
-            os.makedirs(os.path.join(folder, folder_code))
-        cv2.imwrite(os.path.join(folder, folder_code, f'{time.time()}.jpg'), crop_img)
+from utils import save_letter
 
 
 def create_dataset(img_path, response):
@@ -32,11 +20,17 @@ def create_dataset(img_path, response):
         pts = np.array([(vertex.x, vertex.y) for vertex in text.bounding_poly.vertices])
         polys = get_sub_polys(pts, len(text.description), right_padding=0)
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
-            letter = mapping(img, poly, letter)
+            # TEST BLOCK ====================
+            if letter in ['u', 'ú', 'ū', 'ü']:
+                letter = mapping(img, poly, letter)
+                print(letter, end='')
 
-            (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-            crop_img = img[y0 - 15:y2 + 15, x0:x2]
-            save_letter(letter, crop_img, 'all_letters')
+
+# END TEST BLOCK ====================
+# letter = mapping(img, poly, letter)
+# (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+# crop_img = img[y0 - 15:y2 + 15, x0:x2]
+# save_letter(letter, crop_img, 'all_letters')
 
 
 if __name__ == '__main__':
