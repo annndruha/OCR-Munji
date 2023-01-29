@@ -16,8 +16,8 @@ def save_letter(letter, crop_img, img_comment='', folder='letters'):
     try:
         if not os.path.exists(os.path.join(folder, folder_name)):
             os.makedirs(os.path.join(folder, folder_name))
-        cv2.imwrite(os.path.join(folder, folder_name, f'{img_comment}.jpg'), crop_img) #{time.time()}
+        cv2.imwrite(os.path.join(folder, folder_name, f'{img_comment}.jpg'), crop_img)  # {time.time()}
     except OSError:
         if not os.path.exists(os.path.join(folder, folder_code)):
             os.makedirs(os.path.join(folder, folder_code))
-        cv2.imwrite(os.path.join(folder, folder_code, f'{img_comment}.jpg'), crop_img) #{time.time()}
+        cv2.imwrite(os.path.join(folder, folder_code, f'{img_comment}.jpg'), crop_img)  # {time.time()}

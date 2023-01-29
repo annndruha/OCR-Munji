@@ -1,13 +1,9 @@
 # Marakulin Andrey https://github.com/Annndruha
 # 2023
 
-import os
-import time
-import pickle
-
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+
 from utils import save_letter
 
 
@@ -84,7 +80,7 @@ def __under_dot(img, poly, letter, j):
     prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
     if prob > 0.45:
         letter = letter + u'\u0323'
-    save_letter(letter, img[y0:y2+18, x0:x2], 'udot_{}'.format(j))
+    save_letter(letter, img[y0:y2 + 18, x0:x2], 'udot_{}'.format(j))
     return letter
 
 
@@ -200,7 +196,7 @@ def __acute_i(img, poly, letter, j):
 
 def __upper_comb_u(img, poly, letter, j):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-    crop_img = img[y0-15:y2-25, x0:x2]
+    crop_img = img[y0 - 15:y2 - 25, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     prob = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
@@ -212,7 +208,7 @@ def __upper_comb_u(img, poly, letter, j):
         letter = 'a'
 
     if prob > 0.51:
-        if (prob+1-prob2)/2 > 0.5:
+        if (prob + 1 - prob2) / 2 > 0.5:
             letter = 'ā́' if letter == 'a' else 'ū́'  # letter += u'\u0304' + u'\u0301'
         else:
             letter = 'ā' if letter == 'a' else 'ū'  # letter += u'\u0304'
@@ -220,5 +216,5 @@ def __upper_comb_u(img, poly, letter, j):
         if np.average(crop_img) / 255. < 0.95:  # else empty
             letter = 'á' if letter == 'a' else 'ú'  # letter += u'\u0301'
 
-    save_letter(letter, img[y0-15:y2, x0:x2], 'comb_u_{}'.format(j))
+    save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u_{}'.format(j))
     return letter
