@@ -33,16 +33,14 @@ def save_letter(letter, crop_img):
     cv2.imwrite(os.path.join('letters', folder_name, f'{time.time()}.jpg'), crop_img)
 
 
-def ord353(img, poly):
+def under_dot(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y2 - 2:y2 + 18, x0:x2]
     crop_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     template = cv2.imread('templates/dot.jpg')
     if np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED)) > 0.45:
-        letter = 'ṣ̌'
-    else:
-        letter = 'š'
+        letter = letter + u'\u0323'
     save_letter(letter, crop_img)
     return letter
 
@@ -57,18 +55,18 @@ def create_dataset(img_path, response):
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
             (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
 # ====================================================================================================
-            if ord(letter) == 353:
-                letter = ord353(img, poly)
+            if ord(letter) in [ord('š'), ord('ž'), ord('č')]:
+                letter = under_dot(img, poly, letter)
 # ====================================================================================================
-            # crop_img = img[y0-15:y2+15, x0:x2]
-            # try:
-            #     if not os.path.exists(os.path.join('letters', str(ord(letter)) + f'_{letter}')):
-            #         os.makedirs(os.path.join('letters', str(ord(letter)) + f'_{letter}'))
-            #     cv2.imwrite(os.path.join('letters', str(ord(letter)) + f'_{letter}', f'{time.time()}.jpg'), crop_img)
-            # except OSError:
-            #     if not os.path.exists(os.path.join('letters', str(ord(letter)))):
-            #         os.makedirs(os.path.join('letters', str(ord(letter))))
-            #     cv2.imwrite(os.path.join('letters', str(ord(letter)), f'{time.time()}.jpg'), crop_img)
+#             crop_img = img[y0-15:y2+15, x0:x2]
+#             try:
+#                 if not os.path.exists(os.path.join('all_letters', str(ord(letter)) + f'_{letter}')):
+#                     os.makedirs(os.path.join('all_letters', str(ord(letter)) + f'_{letter}'))
+#                 cv2.imwrite(os.path.join('all_letters', str(ord(letter)) + f'_{letter}', f'{time.time()}.jpg'), crop_img)
+#             except OSError:
+#                 if not os.path.exists(os.path.join('all_letters', str(ord(letter)))):
+#                     os.makedirs(os.path.join('all_letters', str(ord(letter))))
+#                 cv2.imwrite(os.path.join('all_letters', str(ord(letter)), f'{time.time()}.jpg'), crop_img)
 
 
 if __name__ == '__main__':
