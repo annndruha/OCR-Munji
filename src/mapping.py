@@ -48,8 +48,8 @@ def mapping(img, poly, letter: str, j) -> str:
             'ā': __upper_comb_u,
 
             'o': __acute_o,
+            'ó': __check_reversed_e_acute_o,
             'k': __acute_k,
-            # 'b': __acute_b,
             'g': __acute_g,
             'i': __acute_i,
         }
@@ -116,6 +116,21 @@ def __check_reversed_e_acute(img, poly, letter, j):
     else:
         letter = 'ə́'
     save_letter(letter, crop_img, 'revers_e_acute_{}'.format(j))
+    return letter
+
+
+def __check_reversed_e_acute_o(img, poly, letter, j):
+    (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+    crop_img = img[y0:y2, x0:x2]
+    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+
+    prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/o_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    if prob1 > prob2:
+        letter = 'ó'
+    else:
+        letter = 'ə́'
+    save_letter(letter, crop_img, 'revers_e_acute_o_{}'.format(j))
     return letter
 
 
@@ -199,7 +214,7 @@ def __upper_comb_u(img, poly, letter, j):
     crop_img = img[y0 - 15:y2 - 25, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
-    prob = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line.jpg'), cv2.TM_CCOEFF_NORMED))
 
     if letter in ['u', 'ú', 'ū', 'ü']:
@@ -207,14 +222,27 @@ def __upper_comb_u(img, poly, letter, j):
     elif letter in ['a', 'á', 'ã', 'ā']:
         letter = 'a'
 
-    if prob > 0.51:
-        if (prob + 1 - prob2) / 2 > 0.5:
+    if prob1 > 0.51:
+        if prob1 > prob2:
             letter = 'ā́' if letter == 'a' else 'ū́'  # letter += u'\u0304' + u'\u0301'
         else:
             letter = 'ā' if letter == 'a' else 'ū'  # letter += u'\u0304'
     else:
-        if np.average(crop_img) / 255. < 0.95:  # else empty
+        prob3 = np.average(crop_img) / 255.
+        if prob3 > 0.95:  # Empty space
+            letter = letter
+        else:
             letter = 'á' if letter == 'a' else 'ú'  # letter += u'\u0301'
+            if letter == 'á':
+                crop_img = img[y0:y2, x0:x2]
+                bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None,
+                                                 value=(230, 255, 255))
+                prob4 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/ə_acute.jpg'),
+                                                 cv2.TM_CCOEFF_NORMED))
+                if prob4 > 0.9:
+                    letter = 'ə́'
+                else:
+                    letter = 'á'
 
     save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u_{}'.format(j))
     return letter
