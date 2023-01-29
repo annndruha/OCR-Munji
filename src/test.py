@@ -14,7 +14,7 @@ from processing_rules import mapping, get_sub_polys
 from utils import save_letter
 
 
-def create_dataset(img_path, response):
+def create_dataset(img_path, response, j):
     img = cv2.imread(img_path)
     texts = response.text_annotations
     result_text = []
@@ -26,7 +26,8 @@ def create_dataset(img_path, response):
             # TEST BLOCK ====================
             # if letter in ['o']:
             #     letter = mapping(img, poly, letter)
-            letter = mapping(img, poly, letter)
+            letter = mapping(img, poly, letter, j)
+            j += 1
             word_letters.append(letter)
         result_text.append(''.join(word_letters))
     text = ''
@@ -54,22 +55,22 @@ def create_dataset(img_path, response):
 if __name__ == '__main__':
     shutil.rmtree('letters', ignore_errors=True)
 
-    # IMG_PATH = "tests/text1/img.png"
-    # RESP_PATH = "tests/text1/google_response.pickle"
-    # with open(RESP_PATH, "rb") as f:
-    #     from google.cloud import vision  # This 'unused' import used for pickle.load
-    #     response = pickle.load(f)
-    # create_dataset(IMG_PATH, response)
+    IMG_PATH = "tests/text1/img.png"
+    RESP_PATH = "tests/text1/google_response.pickle"
+    with open(RESP_PATH, "rb") as f:
+        from google.cloud import vision  # This 'unused' import used for pickle.load
+        response = pickle.load(f)
+    create_dataset(IMG_PATH, response, 100000)
 
     IMG_PATH = "tests/text2/img.png"
     RESP_PATH = "tests/text2/google_response.pickle"
     with open(RESP_PATH, "rb") as f:
         from google.cloud import vision  # This 'unused' import used for pickle.load
         response = pickle.load(f)
-    create_dataset(IMG_PATH, response)
+    create_dataset(IMG_PATH, response, 200000)
 
-    with open('tests/text2/result.txt', 'w') as f:
-        f.write(create_dataset(IMG_PATH, response))
+    # with open('tests/text2/result.txt', 'w') as f:
+    #     f.write(create_dataset(IMG_PATH, response))
 
     # import cv2
     # import numpy as np
