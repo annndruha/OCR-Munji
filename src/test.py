@@ -24,9 +24,6 @@ def create_dataset(img_path, response, j):
         polys = get_sub_polys(pts, len(text.description), right_padding=0)
         word_letters = []
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
-            # TEST BLOCK ====================
-            # if letter in ['o']:
-            #     letter = mapping(img, poly, letter)
             letter = mapping(img, poly, letter, j)
             j += 1
             word_letters.append(letter)
@@ -46,16 +43,8 @@ def create_dataset(img_path, response, j):
     return text
 
 
-# END TEST BLOCK ====================
-# letter = mapping(img, poly, letter)
-# (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-# crop_img = img[y0 - 15:y2 + 15, x0:x2]
-# save_letter(letter, crop_img, 'all_letters')
-
-
 if __name__ == '__main__':
-    shutil.rmtree('letters', ignore_errors=True)
-
+    # shutil.rmtree('letters', ignore_errors=True)
     IMG_PATH = "tests/text1/img.png"
     RESP_PATH = "tests/text1/google_response.pickle"
     with open(RESP_PATH, "rb") as f:

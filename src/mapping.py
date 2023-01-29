@@ -4,7 +4,7 @@
 import cv2
 import numpy as np
 
-from utils import save_letter
+# from utils import save_letter
 
 
 def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_padding=0):
@@ -60,14 +60,14 @@ def mapping(img, poly, letter: str, j) -> str:
                 return ''
             return res(img, poly, letter, j)  # Process special letter
         else:
-            (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-            crop_img = img[y0:y2, x0:x2]
-            save_letter(d[letter], crop_img, 'dict_{}'.format(j))
+            # (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+            # crop_img = img[y0:y2, x0:x2]
+            # save_letter(d[letter], crop_img, 'dict_{}'.format(j))
             return d[letter]  # Mistake case
     except KeyError:
-        (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-        crop_img = img[y0:y2, x0:x2]
-        save_letter(letter, crop_img, 'unchanged_{}'.format(j))
+        # (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+        # crop_img = img[y0:y2, x0:x2]
+        # save_letter(letter, crop_img, 'unchanged_{}'.format(j))
         return letter  # Work well or unknown
 
 
@@ -80,7 +80,7 @@ def __under_dot(img, poly, letter, j):
     prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
     if prob > 0.45:
         letter = letter + u'\u0323'
-    save_letter(letter, img[y0:y2 + 18, x0:x2], 'udot_{}'.format(j))
+    # save_letter(letter, img[y0:y2 + 18, x0:x2], 'udot_{}'.format(j))
     return letter
 
 
@@ -100,7 +100,7 @@ def __check_reversed_e(img, poly, letter, j):
             letter = 'ə́'
         else:
             letter = 'ə'
-    save_letter(letter, crop_img, 'revers_e_{}'.format(j))
+    # save_letter(letter, crop_img, 'revers_e_{}'.format(j))
     return letter
 
 
@@ -115,7 +115,7 @@ def __check_reversed_e_acute(img, poly, letter, j):
         letter = 'é'
     else:
         letter = 'ə́'
-    save_letter(letter, crop_img, 'revers_e_acute_{}'.format(j))
+    # save_letter(letter, crop_img, 'revers_e_acute_{}'.format(j))
     return letter
 
 
@@ -130,7 +130,7 @@ def __check_reversed_e_acute_o(img, poly, letter, j):
         letter = 'ó'
     else:
         letter = 'ə́'
-    save_letter(letter, crop_img, 'revers_e_acute_o_{}'.format(j))
+    # save_letter(letter, crop_img, 'revers_e_acute_o_{}'.format(j))
     return letter
 
 
@@ -145,7 +145,7 @@ def __acute_o(img, poly, letter, j):
         letter = 'ó'
     else:
         letter = 'o'
-    save_letter(letter, crop_img, 'comb_o_{}'.format(j))
+    # save_letter(letter, crop_img, 'comb_o_{}'.format(j))
     return letter
 
 
@@ -160,7 +160,7 @@ def __acute_k(img, poly, letter, j):
         letter = 'ḱ'
     else:
         letter = 'k'
-    save_letter(letter, crop_img, 'comb_k_{}'.format(j))
+    # save_letter(letter, crop_img, 'comb_k_{}'.format(j))
     return letter
 
 
@@ -175,7 +175,7 @@ def __acute_g(img, poly, letter, j):
         letter = 'ǵ'
     else:
         letter = 'g'
-    save_letter(letter, crop_img, 'comb_g_{}'.format(j))
+    # save_letter(letter, crop_img, 'comb_g_{}'.format(j))
     return letter
 
 
@@ -190,23 +190,8 @@ def __acute_i(img, poly, letter, j):
         letter = 'í'
     else:
         letter = 'i'
-    save_letter(letter, crop_img, 'comb_i_{}'.format(j))
+    # save_letter(letter, crop_img, 'comb_i_{}'.format(j))
     return letter
-
-
-# def __acute_b(img, poly, letter, j):
-#     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-#     crop_img = img[y0:y2, x0:x2]
-#     bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
-#
-#     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/b_acute.jpg'), cv2.TM_CCOEFF_NORMED))
-#     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/b.jpg'), cv2.TM_CCOEFF_NORMED))
-#     if prob1 > prob2:
-#         letter = 'b'
-#     else:
-#         letter = 'b'
-#     save_letter(letter, crop_img, 'comb_k_{}'.format(j))
-#     return letter
 
 
 def __upper_comb_u(img, poly, letter, j):
@@ -251,5 +236,5 @@ def __upper_comb_u(img, poly, letter, j):
                 else:
                     letter = 'á'
 
-    save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u_{}'.format(j))
+    # save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u_{}'.format(j))
     return letter
