@@ -12,9 +12,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from mapping import mapping, get_sub_polys
+j = 0
 
 
-def postprocess_text(img_path: str, response: AnnotateImageResponse, j: int):
+def postprocess_text(img_path: str, response: AnnotateImageResponse, debug=False):
+    global j
+    j += 10000
     img = cv2.imread(img_path)
     texts = response.text_annotations
     result_text = []
@@ -23,7 +26,7 @@ def postprocess_text(img_path: str, response: AnnotateImageResponse, j: int):
         polys = get_sub_polys(pts, len(text.description), right_padding=0)
         word_letters = []
         for i, (letter, poly) in enumerate(zip(text.description, polys)):
-            letter = mapping(img, poly, letter, j)
+            letter = mapping(img, poly, letter, j, debug)
             j += 1
             word_letters.append(letter)
         result_text.append(''.join(word_letters))
