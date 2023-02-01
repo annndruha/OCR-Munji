@@ -23,6 +23,8 @@ def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_p
 
 
 def mapping(img, poly, letter: str, j, debug) -> str:
+    if j == 11277:
+        print('fdg')
     try:
         d = {
             # 'S': 'š' + u'\u0323',
@@ -31,6 +33,7 @@ def mapping(img, poly, letter: str, j, debug) -> str:
             'e': __check_reversed_e,
             'é': __check_reversed_e_acute,
             'ś': 'ə' + u'\u0301',
+            'ğ': 'š',
 
             'ṣ': __under_dot,
             'š': __under_dot,
@@ -77,7 +80,7 @@ def mapping(img, poly, letter: str, j, debug) -> str:
 def __under_dot(img, poly, letter, j, debug):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y2 - 2:y2 + 18, x0:x2]
-    crop_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    crop_img = cv2.copyMakeBorder(crop_img, 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     template = cv2.imread('templates/dot.jpg')
     prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
@@ -215,10 +218,10 @@ def __upper_comb_u(img, poly, letter, j, debug):
 
     if letter in ['u', 'ú', 'ū', 'ü']:
         letter = 'u'
-    elif letter in ['a', 'á', 'ã', 'ā']:
+    elif letter in ['a', 'á', 'ä', 'ã', 'ā']:
         letter = 'a'
 
-    print(prob1)
+    # print(prob1)
     if prob1 > 0.51:
         if prob1 > prob2:
             letter = 'ā́' if letter == 'a' else 'ū́'  # letter += u'\u0304' + u'\u0301'
@@ -248,7 +251,7 @@ def __upper_comb_u(img, poly, letter, j, debug):
                 else:
                     letter = 'á'
     if debug:
-        d = {'u': 'u', 'ú': 'uacute', 'ū́':'uacuteline', 'a': 'a', 'á': 'aacute', 'ā́':'aacuteline', 'ə':'reve', 'ə́':'reveacute'}
-        save_letter('$', img[y0 - 15:y2 - 25, x0:x2], f'{d[letter]}_{j}')
+        # d = {'u': 'u', 'ú': 'uacute', 'ū́':'uacuteline', 'a': 'a', 'á': 'aacute', 'ā́':'aacuteline', 'ə':'reve', 'ə́':'reveacute'}
+        # save_letter('$', img[y0 - 15:y2, x0:x2], f'{d[letter]}_{j}')
         save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u_{}'.format(j))
     return letter

@@ -2,6 +2,7 @@
 # 2023
 import os.path
 import pickle
+import shutil
 import glob
 
 from google.cloud.vision import AnnotateImageResponse
@@ -10,7 +11,9 @@ from postprocess_text import postprocess_text
 
 
 if __name__ == '__main__':
-    folders = glob.glob('tests/*')
+    shutil.rmtree('letters', ignore_errors=True)
+    # folders = glob.glob('tests/*')
+    folders = ['tests/page148']
     for folder in folders:
         IMG_PATH = os.path.join(folder, "img.png")
         RESP_PATH = os.path.join(folder, "google_response.pickle")
