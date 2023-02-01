@@ -22,18 +22,26 @@ def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_p
     return polys
 
 
-def mapping(img, poly, letter: str, j, debug) -> str:
-    if j == 11277:
-        print('fdg')
+def instant_replace(letter):
     try:
-        d = {
-            # 'S': 'š' + u'\u0323',
+        replace = {
             'j': 'ǰ',
             'J': 'ǰ',
+            'x̌': 'ž',
+            'ğ': 'š',
+            'ś': 'ə' + u'\u0301'}
+        letter = replace[letter]
+        return letter
+    except KeyError:
+        return letter
+
+
+def mapping(img, poly, letter: str, j, debug) -> str:
+    try:
+        letter = instant_replace(letter)
+        d = {
             'e': __check_reversed_e,
             'é': __check_reversed_e_acute,
-            'ś': 'ə' + u'\u0301',
-            'ğ': 'š',
 
             'ṣ': __under_dot,
             'š': __under_dot,
