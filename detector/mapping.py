@@ -100,7 +100,10 @@ def __save_letter(letter, crop_img, img_comment=None, folder='letters'):
         try:
             if not os.path.exists(os.path.join(folder, folder_name)):
                 os.makedirs(os.path.join(folder, folder_name))
-            cv2.imwrite(os.path.join(folder, folder_name, f'{img_comment}.jpg'), crop_img)
+            try:
+                cv2.imwrite(os.path.join(folder, folder_name, f'{img_comment}.jpg'), crop_img)
+            except cv2.error:
+                print(f'Debug save letter {letter} failed')
         except OSError:
             if not os.path.exists(os.path.join(folder, folder_code)):
                 os.makedirs(os.path.join(folder, folder_code))
@@ -112,8 +115,7 @@ def __under_dot(img, poly, letter):
     crop_img = img[y2 - 2:y2 + 18, x0:x2]
     crop_img = cv2.copyMakeBorder(crop_img, 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
-    template = cv2.imread('templates/dot.jpg')
-    prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
+    prob = np.max(cv2.matchTemplate(crop_img, cv2.imread('templates/dot.jpg'), cv2.TM_CCOEFF_NORMED))
     if prob > 0.45:
         letter = letter + u'\u0323'
 
@@ -209,7 +211,7 @@ def __acute_k(img, poly, letter):
 def __acute_g(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
-    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
     prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/g_acute.jpg'), cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/g.jpg'), cv2.TM_CCOEFF_NORMED))
@@ -225,9 +227,10 @@ def __acute_g(img, poly, letter):
 def __acute_i(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
-    bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
+    bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
-    prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/i_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    template = cv2.imread('templates/i_acute.jpg')
+    prob1 = np.max(cv2.matchTemplate(bounded_img, template, cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/i.jpg'), cv2.TM_CCOEFF_NORMED))
     if prob1 > prob2:
         letter = 'í'
@@ -243,7 +246,8 @@ def __upper_comb_u(img, poly, letter):
     crop_img = img[y0 - 15:y2 - 25, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
 
-    prob1 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line_acute.jpg'), cv2.TM_CCOEFF_NORMED))
+    template = cv2.imread('templates/line_acute.jpg')
+    prob1 = np.max(cv2.matchTemplate(bounded_img, template, cv2.TM_CCOEFF_NORMED))
     prob2 = np.max(cv2.matchTemplate(bounded_img, cv2.imread('templates/line.jpg'), cv2.TM_CCOEFF_NORMED))
 
     if letter in ['u', 'ú', 'ū', 'ü']:

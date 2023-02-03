@@ -1,6 +1,7 @@
 # Marakulin Andrey https://github.com/Annndruha
 # 2023
 import os
+import sys
 import glob
 import pickle
 import argparse
@@ -8,14 +9,14 @@ from pathlib import Path
 
 from google.cloud.vision import AnnotateImageResponse
 
-from src.process_text import process_text
+from detector.process_text import process_text
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Google cloud vision text detection")
     parser.add_argument("imagepath", type=str,
                         help="Path to image for text detection")
-    parser.add_argument("picklepath", type=str, default=None,
+    parser.add_argument("picklepath", type=str, default=None, nargs='?',
                         help="Path to associated pickle file (by google_ocr.py). "
                              "If None, use same filename as image, but with .pickle extension")
     cliargs = parser.parse_args()
@@ -23,8 +24,10 @@ if __name__ == '__main__':
     if cliargs.picklepath is None:
         p = Path(cliargs.imagepath)
         picklepath = p.with_suffix('.pickle')
+        # print('None', cliargs.picklepath)
     else:
         picklepath = Path(cliargs.picklepath)
+        # print(type(cliargs.picklepath), cliargs.picklepath)
 
     with open(picklepath, "rb") as f:
         response: AnnotateImageResponse = pickle.load(f)

@@ -8,7 +8,7 @@ Detector created for book "Грюнберг А.Л. — Мунджанский я
 
 ### Alghoritm
 
-The detector is based on Google cloud vision text detection with additional heuristics that recognize the characters of Munji language. A variety of heuristics are used, such as the correlation of special characters or signs and the replacement of some letters obtained by Google text detection. (See `src/mapping.py`)
+The detector is based on Google cloud vision text detection with additional heuristics that recognize the characters of Munji language. A variety of heuristics are used, such as the correlation of special characters or signs and the replacement of some letters obtained by Google text detection. (See `detector/mapping.py`)
 
 ### Using 
 

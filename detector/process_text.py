@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from google.cloud.vision import AnnotateImageResponse
 
-from src.mapping import mapping, get_sub_polys
+from detector.mapping import mapping, get_sub_polys
 
 
 def process_text(img_path: str, response: AnnotateImageResponse):
