@@ -11,9 +11,9 @@ from postprocess_text import postprocess_text
 
 
 if __name__ == '__main__':
-    shutil.rmtree('letters', ignore_errors=True)
+    # shutil.rmtree('letters', ignore_errors=True)
     # folders = glob.glob('tests/*')
-    folders = ['tests/page148']
+    folders = ['tests/page116']
     for folder in folders:
         IMG_PATH = os.path.join(folder, "img.png")
         RESP_PATH = os.path.join(folder, "google_response.pickle")
