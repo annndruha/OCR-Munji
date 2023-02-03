@@ -110,6 +110,17 @@ def __save_letter(letter, crop_img, img_comment=None, folder='letters'):
             cv2.imwrite(os.path.join(folder, folder_code, f'{img_comment}.jpg'), crop_img)
 
 
+def except_cv2_error(func):
+    def wrapper(img, poly, letter):
+        try:
+            return func(img, poly, letter)
+        except cv2.error as err:
+            return letter
+
+    return wrapper
+
+
+@except_cv2_error
 def __under_dot(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y2 - 2:y2 + 18, x0:x2]
@@ -123,6 +134,7 @@ def __under_dot(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __check_reversed_e(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -144,6 +156,7 @@ def __check_reversed_e(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __check_reversed_e_acute(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -160,6 +173,7 @@ def __check_reversed_e_acute(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __check_reversed_e_acute_o(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -176,6 +190,7 @@ def __check_reversed_e_acute_o(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __acute_o(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -192,6 +207,7 @@ def __acute_o(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __acute_k(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -208,6 +224,7 @@ def __acute_k(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __acute_g(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -224,6 +241,7 @@ def __acute_g(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __acute_i(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
@@ -241,6 +259,7 @@ def __acute_i(img, poly, letter):
     return letter
 
 
+@except_cv2_error
 def __upper_comb_u(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0 - 15:y2 - 25, x0:x2]
