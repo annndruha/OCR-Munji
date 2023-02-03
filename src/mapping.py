@@ -2,6 +2,7 @@
 # 2023
 
 import os
+import time
 
 import cv2
 import numpy as np
@@ -9,27 +10,15 @@ import numpy as np
 DEBUG = False
 
 
-def __save_letter(letter, crop_img, img_comment='', folder='letters'):
-    if DEBUG:
-        folder_code = str('_'.join([str(ord(i)) for i in letter]))
-        folder_name = folder_code + f'_{letter}'
-        try:
-            if not os.path.exists(os.path.join(folder, folder_name)):
-                os.makedirs(os.path.join(folder, folder_name))
-            cv2.imwrite(os.path.join(folder, folder_name, f'{img_comment}.jpg'), crop_img)
-        except OSError:
-            if not os.path.exists(os.path.join(folder, folder_code)):
-                os.makedirs(os.path.join(folder, folder_code))
-            cv2.imwrite(os.path.join(folder, folder_code, f'{img_comment}.jpg'), crop_img)
-
-
-def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_padding=0):
-    x_top = np.linspace(a[0][0], a[1][0], l + 1)
-    x_bottom = np.linspace(a[3][0], a[2][0], l + 1)
-    y_top = np.linspace(a[0][1], a[1][1], l + 1)
-    y_bottom = np.linspace(a[3][1], a[2][1], l + 1)
+# With bounding poly of N-letter word
+# make an N polys for every letter
+def get_sub_polys(poly, word_length, top_padding=0, bottom_padding=0, right_padding=0, left_padding=0):
+    x_top = np.linspace(poly[0][0], poly[1][0], word_length + 1)
+    x_bottom = np.linspace(poly[3][0], poly[2][0], word_length + 1)
+    y_top = np.linspace(poly[0][1], poly[1][1], word_length + 1)
+    y_bottom = np.linspace(poly[3][1], poly[2][1], word_length + 1)
     polys = []
-    for i in range(l):
+    for i in range(word_length):
         pts = [[x_top[i] - left_padding, y_top[i] - top_padding],
                [x_top[i + 1] + right_padding, y_top[i + 1] - top_padding],
                [x_bottom[i + 1] + right_padding, y_bottom[i + 1] + bottom_padding],
@@ -38,23 +27,12 @@ def get_sub_polys(a, l, top_padding=0, bottom_padding=0, right_padding=0, left_p
     return polys
 
 
-def instant_replace(letter):
+# With full img and poly of letter, and letter itself
+# make heuristics replacements and correlation comparisons for fix letter
+# to Munji correct letter
+def mapping(img, poly, letter: str) -> str:
     try:
-        replace = {
-            'j': 'ǰ',
-            'J': 'ǰ',
-            'x̌': 'ž',
-            'ğ': 'š',
-            'ś': 'ə' + u'\u0301'}
-        letter = replace[letter]
-        return letter
-    except KeyError:
-        return letter
-
-
-def mapping(img, poly, letter: str, j, debug) -> str:
-    try:
-        letter = instant_replace(letter)
+        letter = __instant_replace(letter)
         d = {
             'e': __check_reversed_e,
             'é': __check_reversed_e_acute,
@@ -86,22 +64,50 @@ def mapping(img, poly, letter: str, j, debug) -> str:
             (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
             if y2 - y0 < 10 or x2 - x0 < 10:
                 return ''
-            return res(img, poly, letter, j, debug)  # Process special letter
+            return res(img, poly, letter)  # Process special letter
         else:
-            if debug:
-                (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
-                crop_img = img[y0:y2, x0:x2]
-                __save_letter(d[letter], crop_img, 'dict_{}'.format(j))
-            return d[letter]  # Mistake case
-    except KeyError:
-        if debug:
             (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
             crop_img = img[y0:y2, x0:x2]
-            __save_letter(letter, crop_img, 'unchanged_{}'.format(j))
+            __save_letter(d[letter], crop_img, 'dict')
+            return d[letter]  # Mistake case
+    except KeyError:
+        (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
+        crop_img = img[y0:y2, x0:x2]
+        __save_letter(letter, crop_img, 'unchanged')
         return letter  # Work well or unknown
 
 
-def __under_dot(img, poly, letter, j, debug):
+def __instant_replace(letter):
+    try:
+        replace = {
+            'j': 'ǰ',
+            'J': 'ǰ',
+            'x̌': 'ž',
+            'ğ': 'š',
+            'ś': 'ə' + u'\u0301'}
+        letter = replace[letter]
+        return letter
+    except KeyError:
+        return letter
+
+
+def __save_letter(letter, crop_img, img_comment=None, folder='letters'):
+    if DEBUG:
+        if img_comment is None:
+            img_comment = str(time.time())
+        folder_code = str('_'.join([str(ord(i)) for i in letter]))
+        folder_name = folder_code + f'_{letter}'
+        try:
+            if not os.path.exists(os.path.join(folder, folder_name)):
+                os.makedirs(os.path.join(folder, folder_name))
+            cv2.imwrite(os.path.join(folder, folder_name, f'{img_comment}.jpg'), crop_img)
+        except OSError:
+            if not os.path.exists(os.path.join(folder, folder_code)):
+                os.makedirs(os.path.join(folder, folder_code))
+            cv2.imwrite(os.path.join(folder, folder_code, f'{img_comment}.jpg'), crop_img)
+
+
+def __under_dot(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y2 - 2:y2 + 18, x0:x2]
     crop_img = cv2.copyMakeBorder(crop_img, 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -110,12 +116,12 @@ def __under_dot(img, poly, letter, j, debug):
     prob = np.max(cv2.matchTemplate(crop_img, template, cv2.TM_CCOEFF_NORMED))
     if prob > 0.45:
         letter = letter + u'\u0323'
-    if debug:
-        __save_letter(letter, img[y0:y2 + 18, x0:x2], 'udot_{}'.format(j))
+
+    __save_letter(letter, img[y0:y2 + 18, x0:x2], 'udot')
     return letter
 
 
-def __check_reversed_e(img, poly, letter, j, debug):
+def __check_reversed_e(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -131,12 +137,12 @@ def __check_reversed_e(img, poly, letter, j, debug):
             letter = 'ə́'
         else:
             letter = 'ə'
-    if debug:
-        __save_letter(letter, crop_img, 'revers_e_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'revers_e')
     return letter
 
 
-def __check_reversed_e_acute(img, poly, letter, j, debug):
+def __check_reversed_e_acute(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -147,12 +153,12 @@ def __check_reversed_e_acute(img, poly, letter, j, debug):
         letter = 'é'
     else:
         letter = 'ə́'
-    if debug:
-        __save_letter(letter, crop_img, 'revers_e_acute_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'revers_e_acute')
     return letter
 
 
-def __check_reversed_e_acute_o(img, poly, letter, j, debug):
+def __check_reversed_e_acute_o(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -163,12 +169,12 @@ def __check_reversed_e_acute_o(img, poly, letter, j, debug):
         letter = 'ó'
     else:
         letter = 'ə́'
-    if debug:
-        __save_letter(letter, crop_img, 'revers_e_acute_o_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'revers_e_acute_o')
     return letter
 
 
-def __acute_o(img, poly, letter, j, debug):
+def __acute_o(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -179,12 +185,12 @@ def __acute_o(img, poly, letter, j, debug):
         letter = 'ó'
     else:
         letter = 'o'
-    if debug:
-        __save_letter(letter, crop_img, 'comb_o_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'comb_o')
     return letter
 
 
-def __acute_k(img, poly, letter, j, debug):
+def __acute_k(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -195,12 +201,12 @@ def __acute_k(img, poly, letter, j, debug):
         letter = 'ḱ'
     else:
         letter = 'k'
-    if debug:
-        __save_letter(letter, crop_img, 'comb_k_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'comb_k')
     return letter
 
 
-def __acute_g(img, poly, letter, j, debug):
+def __acute_g(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -211,12 +217,12 @@ def __acute_g(img, poly, letter, j, debug):
         letter = 'ǵ'
     else:
         letter = 'g'
-    if debug:
-        __save_letter(letter, crop_img, 'comb_g_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'comb_g')
     return letter
 
 
-def __acute_i(img, poly, letter, j, debug):
+def __acute_i(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0:y2, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 3, 3, 3, 3, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -227,12 +233,12 @@ def __acute_i(img, poly, letter, j, debug):
         letter = 'í'
     else:
         letter = 'i'
-    if debug:
-        __save_letter(letter, crop_img, 'comb_i_{}'.format(j))
+
+    __save_letter(letter, crop_img, 'comb_i')
     return letter
 
 
-def __upper_comb_u(img, poly, letter, j, debug):
+def __upper_comb_u(img, poly, letter):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = poly
     crop_img = img[y0 - 15:y2 - 25, x0:x2]
     bounded_img = cv2.copyMakeBorder(crop_img, 10, 10, 10, 10, cv2.BORDER_CONSTANT, None, value=(230, 255, 255))
@@ -274,8 +280,6 @@ def __upper_comb_u(img, poly, letter, j, debug):
                     letter = 'ə́'
                 else:
                     letter = 'á'
-    if debug:
-        # d = {'u': 'u', 'ú': 'uacute', 'ū́':'uacuteline', 'a': 'a', 'á': 'aacute', 'ā́':'aacuteline', 'ə':'reve', 'ə́':'reveacute'}
-        # __save_letter('$', img[y0 - 15:y2, x0:x2], f'{d[letter]}_{j}')
-        __save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u_{}'.format(j))
+
+    __save_letter(letter, img[y0 - 15:y2, x0:x2], 'comb_u')
     return letter
