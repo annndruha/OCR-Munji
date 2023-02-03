@@ -23,20 +23,18 @@ if __name__ == '__main__':
 
     if cliargs.picklepath is None:
         p = Path(cliargs.imagepath)
-        picklepath = p.with_suffix('.pickle')
-        # print('None', cliargs.picklepath)
+        pickle_path = p.with_suffix('.pickle')
     else:
-        picklepath = Path(cliargs.picklepath)
-        # print(type(cliargs.picklepath), cliargs.picklepath)
+        pickle_path = Path(cliargs.picklepath)
 
-    with open(picklepath, "rb") as f:
+    with open(pickle_path, "rb") as f:
         response: AnnotateImageResponse = pickle.load(f)
 
     text = process_text(cliargs.imagepath, response)
 
-    with open(picklepath.with_suffix('.txt'), 'w') as f:
+    with open(pickle_path.with_suffix('.txt'), 'w') as f:
         f.write(text)
-        print('Result saved as', picklepath.with_suffix('.txt'))
+        print('Result saved as', pickle_path.with_suffix('.txt'))
 
     # folders = glob.glob('tests/*')
     # for folder in folders:

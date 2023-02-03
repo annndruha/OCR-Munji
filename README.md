@@ -18,10 +18,26 @@ For use Google cloud vision you need to get [GOOGLE_APPLICATION_CREDENTIALS](htt
 
 #### Step 2
 
-Get Google cloud vision text detectiob response for image:
+Get Google cloud vision text detection response for image:
 ```commandline
-python src\google_ocr.py --image img.png --print-result
+python detector\google_ocr.py --image img.png --print-result
 ```
 If command succeed, response saved as `.pickle` file.
 
 #### Step 3
+
+Get Munji text from image and google response:
+
+```commandline
+python -m detector tests/page148/img.png tests/page148/google_response.pickle
+```
+
+or simply
+```commandline
+python -m detector tests/page148/img.png
+```
+if response located in same dirictory with same filename as image.
+
+**Result**
+
+Resulted detected text located in `.txt`-file near `.pickle`-file.
