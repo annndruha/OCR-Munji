@@ -10,25 +10,25 @@ from google.cloud import vision
 from google.cloud.vision import AnnotateImageResponse
 
 
-def get_response(path):
+def get_response(img_path):
     """Detects text in the file."""
 
     client = vision.ImageAnnotatorClient()
 
-    with io.open(path, 'rb') as image_file:
+    with io.open(img_path, 'rb') as image_file:
         content = image_file.read()
 
     image = vision.Image(content=content)
 
-    response = client.text_detection(image=image)
+    resp = client.text_detection(image=image)
 
-    if response.error.message:
+    if resp.error.message:
         raise Exception(
             '{}\nFor more info on error messages, check: '
             'https://cloud.google.com/apis/design/errors'.format(
-                response.error.message))
+                resp.error.message))
 
-    return response
+    return resp
 
 
 if __name__ == '__main__':
@@ -50,13 +50,15 @@ if __name__ == '__main__':
     response = get_response(cliargs.path)
     path = Path(cliargs.path)
 
+    if cliargs.print_result:
+        print(response)
+
     if cliargs.save_json:
         with open(path.with_suffix('.json'), 'w') as f:
             json = AnnotateImageResponse.to_json(response)
             f.write(json)
+            print('Google cloud vision text detection response saved as', path.with_suffix('.json'))
     else:
         with open(path.with_suffix('.pickle'), "wb") as f:
             pickle.dump(response, f)
-
-    if cliargs.print_result:
-        print(response)
+            print('Google cloud vision text detection response saved as', path.with_suffix('.pickle'))
