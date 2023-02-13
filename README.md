@@ -1,8 +1,8 @@
 ## OCR-Munji
 
-Text detection of printed text in Munji language.
+Munji language text detection.
 
-Detector created for book "Грюнберг А.Л. — Мунджанский язык Тексты"
+Detector created for book "Грюнберг А.Л. — Мунджанский язык Тексты" with printed text.
 
 ![readme.png](readme.png)
 
